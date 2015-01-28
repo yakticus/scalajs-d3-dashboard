@@ -1,6 +1,7 @@
 package example
 
 import org.scalajs.dom
+import org.scalajs.dom._
 import org.scalajs.dom.extensions._
 
 import scala.concurrent.Future
@@ -11,11 +12,36 @@ import scala.scalajs.js.annotation.JSExport
 
 @JSExport
 object ScalaJSExample {
-  val timeseriesUrls = List(1,2,3,4).map(n => s"/target/scala-2.11/classes/timeseries$n.json")
+  val urlPrefix = "/target/scala-2.11/classes/"
+  val chartDefUrl = urlPrefix + "chart-definitions.json"
   var chartData = List.empty[String]
 
   @JSExport
   def main(target: dom.HTMLElement): Unit = {
+    Ajax.get(chartDefUrl).onSuccess {
+      case xhr =>
+        val chartDefs = JSON.parse(xhr.responseText)
+        val array = chartDefs.asInstanceOf[js.Array[js.Dictionary[js.String]]]
+        val chartDiv = document.createElement("div")
+        target.appendChild(chartDiv)
+
+        array.foreach {
+          e =>
+            val chartTitle = e.apply("name").toString
+            val title = document.createElement("h3")
+            title.textContent = chartTitle
+            chartDiv.appendChild(title)
+
+            val dataSources = e.apply("series").asInstanceOf[js.Array[js.String]]
+            var urls = List.empty[String]
+            dataSources.forEach((s: js.String) => urls = (urlPrefix + s.toString) :: urls)
+            println(urls)
+            getChartData(urls.toList, chartDiv)
+        }
+    }
+  }
+
+  def getChartData(timeseriesUrls: List[String], target: dom.HTMLElement): Unit = {
     val timeseriesFuture = Future.sequence(timeseriesUrls.map(url => Ajax.get(url)))
 
     timeseriesFuture.onSuccess {
