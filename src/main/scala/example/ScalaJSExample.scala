@@ -22,11 +22,13 @@ object ScalaJSExample {
       case xhr =>
         val chartDefs = JSON.parse(xhr.responseText)
         val array = chartDefs.asInstanceOf[js.Array[js.Dictionary[js.String]]]
-        val chartDiv = document.createElement("div")
-        target.appendChild(chartDiv)
-
+        
         array.foreach {
           e =>
+            // div tag where the chart and its title will be
+            val chartDiv = document.createElement("div")
+            target.appendChild(chartDiv)
+
             val chartTitle = e.apply("name").toString
             val title = document.createElement("h3")
             title.textContent = chartTitle
@@ -62,7 +64,7 @@ object ScalaJSExample {
     val element = d3.select(target).append("svg")
       .attr("id", "example-rect")
       .attr("width", 960)
-      .attr("height", 500)
+      .attr("height", 450)
       .append("g")
       .attr("transform", s"translate(0,0)")
 
