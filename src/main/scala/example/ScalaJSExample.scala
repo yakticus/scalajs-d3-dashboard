@@ -22,7 +22,7 @@ object ScalaJSExample {
       case xhr =>
         val chartDefs = JSON.parse(xhr.responseText)
         val array = chartDefs.asInstanceOf[js.Array[js.Dictionary[js.String]]]
-        
+
         array.foreach {
           e =>
             // div tag where the chart and its title will be
@@ -37,7 +37,7 @@ object ScalaJSExample {
             val dataSources = e.apply("series").asInstanceOf[js.Array[js.String]]
             var urls = List.empty[String]
             dataSources.forEach((s: js.String) => urls = (urlPrefix + s.toString) :: urls)
-            println(urls)
+
             getChartData(urls.toList, chartDiv)
         }
     }
